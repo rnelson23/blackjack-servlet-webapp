@@ -1,21 +1,19 @@
-package com.example.blackjack.models;
+package com.example.blackjack;
 
 import java.util.ArrayList;
 
 public class Deck {
-    private final ArrayList<Card> cards;
+    public final ArrayList<Card> cards;
 
     public Deck() {
         cards = new ArrayList<>();
 
-        for (Suit suit : Suit.values()) {
+        for (String suit : new String[]{"♣", "♦", "♥", "♠"}) {
             for (Rank rank : Rank.values()) {
                 cards.add(new Card(rank, suit));
             }
         }
-    }
 
-    public void shuffle() {
         for (int i = 0; i < cards.size(); i++) {
             int j = (int) (Math.random() * cards.size());
             Card temp = cards.get(i);
@@ -26,12 +24,10 @@ public class Deck {
     }
 
     public void dealFaceUp(Hand hand) {
-        Card card = cards.remove(0);
-        card.flip();
-        hand.addCard(card);
+        hand.cards.add(cards.remove(0).flip());
     }
 
     public void dealFaceDown(Hand hand) {
-        hand.addCard(cards.remove(0));
+        hand.cards.add(cards.remove(0));
     }
 }

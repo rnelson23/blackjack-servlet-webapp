@@ -1,64 +1,59 @@
 package com.example.blackjack;
 
-import com.example.blackjack.models.Deck;
-import com.example.blackjack.models.Hand;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
 
-@WebServlet(name = "ControllerServlet", value = "/api")
-public class ControllerServlet extends HttpServlet {
+@WebServlet(name = "Controller", value = "/Controller")
+public class Controller extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String action = request.getParameter("action");
         HttpSession session = request.getSession();
 
         switch (action) {
-            case "deal": {
-                Deck deck = new Deck();
-                deck.shuffle();
-
+            case "Deal": {
                 Hand playerHand = new Hand();
                 Hand dealerHand = new Hand();
+                Deck deck = new Deck();
 
                 deck.dealFaceUp(playerHand);
                 deck.dealFaceUp(dealerHand);
                 deck.dealFaceUp(playerHand);
                 deck.dealFaceDown(dealerHand);
 
-                int bet = Integer.parseInt(request.getParameter("bet"));
-
-                session.setAttribute("deck", deck);
                 session.setAttribute("playerHand", playerHand);
                 session.setAttribute("dealerHand", dealerHand);
-                session.setAttribute("bet", bet);
+                session.setAttribute("deck", deck);
 
                 if (session.getAttribute("money") == null) {
                     session.setAttribute("money", 0);
                 }
 
+                int bet = Integer.parseInt(request.getParameter("bet"));
+                session.setAttribute("bet", bet);
+
                 break;
             }
 
-            case "hit": {
-                Deck deck = (Deck) session.getAttribute("deck");
+            case "Hit": {
                 Hand playerHand = (Hand) session.getAttribute("playerHand");
+                Deck deck = (Deck) session.getAttribute("deck");
                 deck.dealFaceUp(playerHand);
 
                 break;
             }
 
-            case "stand": {
-                Deck deck = (Deck) session.getAttribute("deck");
-                Hand dealerHand = (Hand) session.getAttribute("dealerHand");
+            case "Stand": {
                 Hand playerHand = (Hand) session.getAttribute("playerHand");
+                Hand dealerHand = (Hand) session.getAttribute("dealerHand");
+                Deck deck = (Deck) session.getAttribute("deck");
 
-                dealerHand.flipLastCard();
-                playerHand.stand();
+                playerHand.stood = true;
+                dealerHand.flip();
 
-                while (dealerHand.getHandValue() < 17) {
+                while (dealerHand.value() < 17) {
                     deck.dealFaceUp(dealerHand);
                 }
 
